@@ -34,9 +34,44 @@ export async function generatePDF(
 
     const x = settings.marginMm + col * (cellW + settings.spacingMm)
     const y = settings.marginMm + row * (cellH + settings.spacingMm)
-
     const imageData = selectedImages[i].croppedBase64 || selectedImages[i].processedBase64
-    doc.addImage(imageData, 'JPEG', x, y, cellW, cellH, undefined, 'FAST')
+
+    // Fill cell background white
+    doc.setFillColor(255, 255, 255)
+    doc.rect(x, y, cellW, cellH, 'F')
+
+    // Calculate proper fit to preserve aspect ratio
+    const img = new Image()
+    await new Promise<void>((resolve) => {
+      img.onload = () => resolve()
+      img.src = imageData
+    })
+
+    const imgW = img.naturalWidth
+    const imgH = img.naturalHeight
+    const imgRatio = imgW / imgH
+    const cellRatio = cellW / cellH
+
+    let drawW: number
+    let drawH: number
+    let drawX: number
+    let drawY: number
+
+    if (imgRatio > cellRatio) {
+      // Image wider than cell - fit by width
+      drawW = cellW
+      drawH = cellW / imgRatio
+      drawX = x
+      drawY = y + (cellH - drawH) / 2
+    } else {
+      // Image taller than cell - fit by height
+      drawH = cellH
+      drawW = cellH * imgRatio
+      drawX = x + (cellW - drawW) / 2
+      drawY = y
+    }
+
+    doc.addImage(imageData, 'JPEG', drawX, drawY, drawW, drawH)
   }
 
   doc.save('photo-sheet.pdf')

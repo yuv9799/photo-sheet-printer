@@ -15,8 +15,19 @@ function SortableItem({ id, fileName, status, included, onRemove, onToggle, onCr
   const img = usePhotoStore.getState().images.find(i => i.id === id)
   return (
     <div ref={setNodeRef} style={{ ...style, display: 'flex', alignItems: 'center', gap: 10, padding: 10, background: '#263548', borderRadius: 8, marginBottom: 8, cursor: 'move' }} {...attributes} {...listeners}>
-      <div style={{ width: 56, height: 56, borderRadius: 6, overflow: 'hidden', flexShrink: 0, background: '#374151' }}>
-        <img src={img?.croppedBase64 || img?.processedBase64 || ''} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+      <div style={{ width: 56, height: 56, background: '#374151', borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0 }}>
+        <img
+          src={img?.croppedBase64 || img?.processedBase64 || ''}
+          alt=""
+          style={{
+            maxWidth: '100%',
+            maxHeight: '100%',
+            width: 'auto',
+            height: 'auto',
+            objectFit: 'contain',
+            display: 'block',
+          }}
+        />
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ color: '#F1F5F9', fontSize: 12, fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 6 }}>{fileName}</div>

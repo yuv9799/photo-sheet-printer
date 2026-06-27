@@ -58,31 +58,44 @@ export async function processImage(file: File, options: { whiteBackground: boole
   }
   ctx.putImageData(imgData, 0, 0)
 
-  function findEdge(sx: number, sy: number, dx: number, dy: number): number {
-    let x = sx, y = sy
-    while (x >= 0 && x < canvas.width && y >= 0 && y < canvas.height) {
-      const idx = (y * canvas.width + x) * 4
-      if (!(d[idx] > 240 && d[idx+1] > 240 && d[idx+2] > 240 && d[idx+3] > 20)) {
-        return x + y * canvas.width
+  // Conservative auto-crop - only trim obvious large empty borders (>5%)
+  const THRESHOLD = 245
+  const MIN_BORDER_PCT = 0.05
+
+  function isWhiteRow(y: number): boolean {
+    for (let x = 0; x < canvas.width; x++) {
+      const i = (y * canvas.width + x) * 4
+      if (d[i] < THRESHOLD || d[i+1] < THRESHOLD || d[i+2] < THRESHOLD) {
+        return false
       }
-      x += dx
-      y += dy
     }
-    return sx + sy * canvas.width
+    return true
   }
 
-  const top = findEdge(0, 0, 0, 1)
-  const bot = findEdge(0, canvas.height - 1, 0, -1)
-  const left = findEdge(0, 0, 1, 0)
-  const right = findEdge(canvas.width - 1, 0, -1, 0)
-  const topY = Math.floor(top / canvas.width)
-  const botY = Math.floor(bot / canvas.width)
-  const leftX = left % canvas.width
-  const rightX = right % canvas.width
-  const cropW = rightX - leftX
-  const cropH = botY - topY
-  if (cropW > 0 && cropH > 0) {
-    const cropped = ctx.getImageData(leftX, topY, cropW, cropH)
+  function isWhiteCol(x: number): boolean {
+    for (let y = 0; y < canvas.height; y++) {
+      const i = (y * canvas.width + x) * 4
+      if (d[i] < THRESHOLD || d[i+1] < THRESHOLD || d[i+2] < THRESHOLD) {
+        return false
+      }
+    }
+    return true
+  }
+
+  let top = 0
+  let bot = canvas.height - 1
+  let left = 0
+  let right = canvas.width - 1
+
+  while (top < canvas.height * MIN_BORDER_PCT && isWhiteRow(top)) top++
+  while (bot > canvas.height * (1 - MIN_BORDER_PCT) && isWhiteRow(bot)) bot--
+  while (left < canvas.width * MIN_BORDER_PCT && isWhiteCol(left)) left++
+  while (right > canvas.width * (1 - MIN_BORDER_PCT) && isWhiteCol(right)) right--
+
+  const cropW = right - left + 1
+  const cropH = bot - top + 1
+  if (cropW > 0 && cropH > 0 && cropW < canvas.width && cropH < canvas.height) {
+    const cropped = ctx.getImageData(left, top, cropW, cropH)
     canvas.width = cropW
     canvas.height = cropH
     ctx.putImageData(cropped, 0, 0)

@@ -75,11 +75,24 @@ export default function A4Preview() {
                 width: cellWPct + '%',
                 height: cellHPct + '%',
                 overflow: 'hidden',
+                background: '#ffffff',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                border: '0.5px solid #e5e7eb',
+                boxSizing: 'border-box',
               }}>
                 <img
                   src={img.croppedBase64 || img.processedBase64}
                   alt=""
-                  style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                  style={{
+                    maxWidth: '100%',
+                    maxHeight: '100%',
+                    width: 'auto',
+                    height: 'auto',
+                    objectFit: 'contain',
+                    display: 'block',
+                  }}
                 />
               </div>
             )
