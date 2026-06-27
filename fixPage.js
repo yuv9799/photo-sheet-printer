@@ -1,4 +1,5 @@
-import Header from './components/Header'
+const fs = require('fs')
+fs.writeFileSync('app/page.tsx', `import Header from './components/Header'
 import UploadZone from './components/UploadZone'
 import LayoutControls from './components/LayoutControls'
 import A4Preview from './components/A4Preview'
@@ -20,7 +21,9 @@ export default function Home() {
         </main>
         <Sidebar />
       </div>
-      <style>{`.animate-slide-in { animation: slideIn 0.3s ease-out; } @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }`}</style>
+      <style>{\`.animate-slide-in { animation: slideIn 0.3s ease-out; } @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }\`}</style>
     </div>
   )
 }
+`)
+console.log('done')
