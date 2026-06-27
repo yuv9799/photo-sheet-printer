@@ -16,6 +16,7 @@ interface PhotoStore {
   toggleIncluded: (id: string) => void
   reorderImages: (oldIndex: number, newIndex: number) => void
   clearAll: () => void
+  updateImageCrop: (id: string, croppedBase64: string) => void
   setLayoutSettings: (s: Partial<LayoutSettings>) => void
   setWhiteBackground: (v: boolean) => void
   setBgTolerance: (v: number) => void
@@ -57,6 +58,7 @@ export const usePhotoStore = create<PhotoStore>((set, get) => ({
   toggleIncluded: (id) => set(s => ({ images: s.images.map(i => i.id === id ? { ...i, included: !i.included } : i) })),
   reorderImages: (oldIndex, newIndex) => set(s => { const a = [...s.images]; const [m] = a.splice(oldIndex, 1); a.splice(newIndex, 0, m); return { images: a } }),
   clearAll: () => { set({ images: [], currentPreviewPage: 1 }); get().addToast('All images cleared', 'success') },
+  updateImageCrop: (id, croppedBase64) => set(s => ({ images: s.images.map(img => img.id === id ? { ...img, croppedBase64 } : img) })),
   setLayoutSettings: (s) => set(state => ({ layoutSettings: { ...state.layoutSettings, ...s }, currentPreviewPage: 1 })),
   setWhiteBackground: (v) => { set({ whiteBackground: v }); if (v) get().reprocessAll() },
   setBgTolerance: (v) => { set({ bgTolerance: v }); if (get().whiteBackground) get().reprocessAll() },

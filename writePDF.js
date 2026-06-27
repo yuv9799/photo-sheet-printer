@@ -1,4 +1,5 @@
-import { jsPDF } from 'jspdf'
+const fs = require('fs')
+fs.writeFileSync('app/lib/generatePDF.ts', `import { jsPDF } from 'jspdf'
 
 export async function generatePDF(
   images: { processedBase64: string; croppedBase64?: string; included: boolean; status: string }[],
@@ -41,3 +42,5 @@ export async function generatePDF(
 
   doc.save('photo-sheet.pdf')
 }
+`)
+console.log('wrote generatePDF.ts')

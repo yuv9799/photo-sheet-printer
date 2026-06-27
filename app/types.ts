@@ -3,6 +3,7 @@ export interface ProcessedImage {
   fileName: string
   originalFile: File
   processedBase64: string
+  croppedBase64?: string
   status: 'processing' | 'ready' | 'error'
   included: boolean
   error?: string
